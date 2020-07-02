@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<body>
+    <div class="text-center" id="ye">
+        <label for="From" id="from">From:</label><br>
+        <input type="text" id="start" name="start"><br>
+        <label for="from">To:</label><br>
+        <input type="text" id="end" name="from"><br />
+        <input type="submit" value="Submit" onclick="generate()">
+
+
+
+
+    </div>
+    <div id="list">
+
+    </div>
+
+
+    <div id="list2">
+
+    </div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+
+<script src="~/js/filesaver.js"></script>
+<script src="~/js/JsBarcode.all.min.js"></script>
+
+
+
+
+<script>function generate() {
+        $('#list').empty();
+        var start = document.getElementById('start').value;
+        var end = document.getElementById('end').value;
+
+        for (var i = start; i <= end; i++) {
+            //var html = '<svg id="test' + i + '"></svg>';
+
+            var html = '<canvas id="test' + i + '" style="display:none"></canvas>';
+            document.getElementById("list").innerHTML +=
+                html;
+            var bid = 'test' + i;
+            var canvas = document.getElementById(bid);
+            var img = canvas.toDataURL("image/png");
+
+            // document.getElementById("list").innerHTML +=
+            //    '<img src="' + img + '" />';
+
+    }
+    var urls = [];
+    for (var i = start; i <= end; i++)
+    {
+            //var html = '<svg id="test' + i + '"></svg>';
+
+            var barcodeid = '#test' + i;
+            var bid = 'test' + i;
+
+
+            JsBarcode(barcodeid, i);
+
+            var image = new Image();
+            image.id = "pic";
+            var bid = 'test' + i;
+            var canvas = document.getElementById(bid);
+            image.src = canvas.toDataURL("image/png");
+            urls.push(image.src);
+            document.getElementById('list2').appendChild(image);
+
+
+    }
+
+
+    var zip = new JSZip();
+    var count = 0;
+    var zipFilename = "barcode_zipped.zip";
+
+    var j = 0;
+    urls.forEach(function (url) {
+        var filename = "barcode" + j + ".jpg";
+        j++;
+        // loading a file and add it in a zip file
+        JSZipUtils.getBinaryContent(url, function (err, data) {
+            if (err) {
+                throw err; // or handle the error
+            }
+            zip.file(filename, data, { binary: true });
+            count++;
+            if (count == urls.length) {
+                zip.generateAsync({ type: 'blob' }).then(function (content) {
+                    saveAs(content, zipFilename);
+                });
+            }
+        });
+    });
+
+
+    }</script>
